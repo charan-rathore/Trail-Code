@@ -243,6 +243,14 @@ test('without trail anywhere, Claude credits a learning it used, and only then o
   assert.match(ctx, /never edit them/);
 });
 
+test('Cursor session start shows the same learning offer through its hook output', () => {
+  const root = tmpRepo('shim-cursor-offer');
+  const repo = clonedWithLearnings(root, 'Kumar S', ['Anirudh']);
+  const out = JSON.parse(runBare(root, repo, 'cursor-session-start'));
+  assert.equal(out.hookSpecificOutput.hookEventName, 'SessionStart');
+  assert.match(out.hookSpecificOutput.additionalContext, /Retries decision 0 \(Anirudh\)/);
+});
+
 test('each learning is listed with its author, newest first, so the credit can name them', () => {
   const root = tmpRepo('shim-offer-names');
   const repo = clonedWithLearnings(root, 'Kumar', ['Anirudh', 'Priya', 'Sam']);
@@ -268,6 +276,7 @@ test('without trail, other events and a repo with no learnings stay silent', () 
   const root = tmpRepo('shim-offer-quiet');
   const repo = clonedWithLearnings(root, 'Kumar', ['Anirudh']);
   assert.equal(runBare(root, repo, 'prompt'), '');
+  assert.equal(runBare(root, repo, 'cursor-post-tool'), '');
   assert.equal(runBare(root, repo, 'stop'), '');
   const empty = tmpRepo('shim-offer-empty');
   assert.equal(runBare(empty, project(empty), 'session-start'), '');
