@@ -247,8 +247,9 @@ test('Cursor session start shows the same learning offer through its hook output
   const root = tmpRepo('shim-cursor-offer');
   const repo = clonedWithLearnings(root, 'Kumar S', ['Anirudh']);
   const out = JSON.parse(runBare(root, repo, 'cursor-session-start'));
-  assert.equal(out.hookSpecificOutput.hookEventName, 'SessionStart');
-  assert.match(out.hookSpecificOutput.additionalContext, /Retries decision 0 \(Anirudh\)/);
+  // Cursor's sessionStart reads a top-level additional_context, not Claude's hookSpecificOutput.
+  assert.equal(out.hookSpecificOutput, undefined);
+  assert.match(out.additional_context, /Retries decision 0 \(Anirudh\)/);
 });
 
 test('each learning is listed with its author, newest first, so the credit can name them', () => {
